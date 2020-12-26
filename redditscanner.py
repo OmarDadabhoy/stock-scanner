@@ -2,13 +2,18 @@ import requests
 import requests.auth
 import os
 import csv
+import getpass
 
 #constants
-# Make sure you fix this before pushing TODO create constants as well before. 
-username = ""
-password = ""
-APPID = ''
-APPSECRET = ''
+# Ask user for information about their username and stuff
+print("Enter your reddit username: ")
+username = str(input())
+print("Enter your reddit password: ")
+password = getpass.getpass()
+print("Enter your APPID: ")
+APPID = str(input())
+print("Enter your app secret: ")
+APPSECRET = str(input())
 
 # This puts the CSV tickers and names into a map
 def convertCSVToMap():
@@ -25,7 +30,6 @@ def convertCSVToMap():
 
 
 # This function needs to add any stock tickers passed in into the mapOfStocks
-# TODO check if this works and see what happens
 def addStocks(sentence, mapOfStocks, allstocks):
     splits = sentence.split()
     for word in splits:
@@ -44,35 +48,53 @@ auth = requests.auth.HTTPBasicAuth(APPID, APPSECRET)
 r = requests.post(base_url + 'api/v1/access_token', data=data, headers={'user-agent': 'stock-scanner-script by ' + username}, auth=auth)
 d = r.json()
 
-# print(d)
-
 # Make an api request to get user information
 token = 'bearer ' + d['access_token']
 base_url = 'https://oauth.reddit.com'
 headers = {'Authorization': token, 'User-Agent': 'stock-scanner-script by ' + username}
-# response = requests.get(base_url + '/api/v1/me', headers=headers)
 
-# if response.status_code == 200:
-#     print(response.json()['name'], response.json()['comment_karma'])
+# Ask the user what subreddits they want to go through
+subreddits = []
+print("Enter the subreddit/subreddits you want to index then enter done to indicate a finish: ")
+sr = ""
+while sr != "done":
+    sr = str(input())
+    subreddits.append(sr)
 
-
-#Now the code to go through wallst bets
-subreddits = ['wallstreetbets']
+# Get information like time, post types, number of posts
+print("Enter the time limit of the posts you want to grab (Ex: hour, day, week, month, year, all): ")
+time = str(input())
+print("Enter the type of posts you want (Ex: top, hot, controversial, new, rising)")
+postType = str(input())
+print("Enter the number of posts you want to grab from each subreddit (max = 100): ")
+numberOfPosts = int(input())
 
 convertCSVToMap()
 
 #go thorugh the subreddit and grab info we need
-payload = {'t': 'day', 'limit': 1}
+payload = {'t': time, 'limit': numberOfPosts}
 mapOfStocks = {}
 allStocks = convertCSVToMap()
 for s in subreddits: 
-    stringFormat = "/r/" + s + "/top"
+    stringFormat = "/r/" + s + "/" + postType
     postResponse = requests.get(base_url + stringFormat, headers=headers, params=payload)
     js = postResponse.json()
     # print(js)
     # This goes through each piece in the json and only does title for now
     for i in range(js['data']['dist']):
-        if js['data']['children'][i]['data']['title'] == '':
-            continue
         addStocks(js['data']['children'][i]['data']['title'], mapOfStocks, allStocks)
 
+# sort the values of the mapofstocks and go through and print all of them in order
+sortedVals = sorted(mapOfStocks.values())
+seen = {}
+
+#initialize the seen  array
+for key in mapOfStocks.keys():
+    seen.update({key: False})
+
+for i in sortedVals:
+    for key in mapOfStocks.keys():
+        if mapOfStocks.get(key) == i and seen.get(key) == False:
+            print(key + ": " + str(i))
+            seen.update({key: True})
+            break
