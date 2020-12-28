@@ -4,19 +4,6 @@ import os
 import csv
 import getpass
 
-#constants
-# Ask user for information about their username and stuff
-print("Enter your reddit username: ")
-username = str(input())
-print("Enter your reddit password: ")
-password = getpass.getpass()
-APPID = ''
-APPSECRET = ''
-# print("Enter your APPID: ")
-# APPID = str(input())
-# print("Enter your app secret: ")
-# APPSECRET = str(input())
-
 # This puts the CSV tickers and names into a map
 def convertCSVToMap():
     pathName = os.getcwd()
@@ -41,22 +28,39 @@ def addStocks(sentence, mapOfStocks, allstocks):
             else: 
                 mapOfStocks.update({word: mapOfStocks.get(word) + 1})
 
-# This function gets the comments for the passed in thread in the subreddit
-def getComments(js, i, subreddit, base_url, headers):
-    linkname = js['data']['children'][i]['data']['name']
-    linkname = linkname[3]
-    commentStringFormat = "/r/" + subreddit + "/comments/" + linkname
-    payload = {}
-    postResponse = requests.get(base_url + commentStringFormat, headers=headers)
-    jsonVer = postResponse.json()
-    return jsonVer
+# # This function gets the comments for the passed in thread in the subreddit
+# # TODO need to get done
+# def getComments(js, i, subreddit, base_url, headers):
+#     linkname = js['data']['children'][i]['data']['name']
+#     linkname = linkname[3]
+#     commentStringFormat = "/r/" + subreddit + "/comments/" + linkname
+#     payload = {}
+#     postResponse = requests.get(base_url + commentStringFormat, headers=headers)
+#     jsonVer = postResponse.json()
+#     return jsonVer
 
-# This function processes comments
-def processComments(js, mapOfStocks, allStocks):
-    # for i in range(js['data']['dist']):
-    return True
+# # This function processes comments
+# #TODO need to get done
+# def processComments(js, mapOfStocks, allStocks):
+#     print(js)
+#     # for i in range(js['data']['dist']):
+#     # for list in js:
+#     #     print(x)
+#     return True
 
 
+#constants
+# Ask user for information about their username and stuff
+print("Enter your reddit username: ")
+username = str(input())
+print("Enter your reddit password: ")
+password = getpass.getpass()
+APPID = ''
+APPSECRET = ''
+# print("Enter your APPID: ")
+# APPID = str(input())
+# print("Enter your app secret: ")
+# APPSECRET = str(input())
 
 # Get the access token
 base_url = 'https://www.reddit.com/'
@@ -92,7 +96,7 @@ useDescriptionAnswer = str(input())
 useDescription = False
 if useDescriptionAnswer == "y" or useDescriptionAnswer == "Y":
     useDescription = True
-useComments = True
+# useComments = True
 
 #go thorugh the subreddit and grab info we need
 payload = {'t': time, 'limit': numberOfPosts}
@@ -111,8 +115,9 @@ for s in subreddits:
         if useDescription:
             addStocks(js['data']['children'][i]['data']['selftext'], mapOfStocks, allStocks)
         #comments 
-        if useComments:
-            commentsJson = getComments(js, i, s, base_url, headers)
+        # if useComments:
+        #     commentsJson = getComments(js, i, s, base_url, headers)
+        #     processComments(commentsJson, mapOfStocks, allStocks)
 
 
 # sort the values of the mapofstocks and go through and print all of them in order
@@ -123,6 +128,7 @@ seen = {}
 for key in mapOfStocks.keys():
     seen.update({key: False})
 
+# Print the stuff out
 for i in sortedVals:
     for key in mapOfStocks.keys():
         if mapOfStocks.get(key) == i and seen.get(key) == False:
