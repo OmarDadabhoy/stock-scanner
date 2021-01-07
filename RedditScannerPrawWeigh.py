@@ -3,6 +3,7 @@ import getpass
 import os
 import csv
 import math
+from get_all_tickers import get_tickers as gt
 from praw.models import MoreComments
 
 # This puts the CSV tickers and names into a map
@@ -53,7 +54,13 @@ def processComments(reddit, post, mapOfStocks, allStocks, i):
         if isinstance(comment, MoreComments):
             continue
         addStocks(comment.body, mapOfStocks, allStocks, i)
-    
+
+# converts the stockslist into a map
+def listToMap(stockslist):
+    allStocks = {}
+    for i in stockslist:
+        allStocks.update({i: 1})
+    return allStocks
 
 # Ask user for information about their username and stuff
 print("Enter your reddit username: ")
@@ -96,7 +103,8 @@ if useCommentsAns == 'Y' or useCommentsAns == 'y':
 
 # Create the map and get all the stocks from the csv
 mapOfStocks = {}
-allStocks = convertCSVToMap()
+stockslist = gt.get_tickers()
+allStocks = listToMap(stockslist)
 
 # Go through the subreddits and get the data
 for s in subreddits:
