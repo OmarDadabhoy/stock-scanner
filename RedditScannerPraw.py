@@ -2,6 +2,7 @@ import praw
 import getpass
 import os
 import csv
+from get_all_tickers import get_tickers as gt
 from praw.models import MoreComments
 
 # This puts the CSV tickers and names into a map
@@ -28,7 +29,7 @@ def addStocks(sentence, mapOfStocks, allstocks):
     # Loop through each word
     for word in splits:
         # If the word is a ticker then add it to the mapOfStocks
-        if allstocks.get(word) != None:
+        if containsList(word, allstocks):
             if mapOfStocks.get(word) == None:
                 mapOfStocks.update({word: 1})
             else: 
@@ -46,7 +47,13 @@ def processComments(reddit, post, mapOfStocks, allStocks):
         if isinstance(comment, MoreComments):
             continue
         addStocks(comment.body, mapOfStocks, allStocks)
-    
+
+# Checks if word is in list
+def containsList(word, list):
+    for i in list:
+        if word == i:
+            return True
+    return False
 
 # Ask user for information about their username and stuff
 print("Enter your reddit username: ")
@@ -89,7 +96,7 @@ if useCommentsAns == 'Y' or useCommentsAns == 'y':
 
 # Create the map and get all the stocks from the csv
 mapOfStocks = {}
-allStocks = convertCSVToMap()
+allStocks = gt.get_tickers()
 
 # Go through the subreddits and get the data
 for s in subreddits:
@@ -97,7 +104,7 @@ for s in subreddits:
     subreddit = reddit.subreddit(s)
     # get the posts based on the postTypes the user wants and the number they want. 
     if postType == "hot":
-        posts = subreddit.hot(limit=numberOfPosts, time_filter=time)
+        posts = subreddit.hot(limit=numberOfPosts)
     elif postType == "top":
         posts = subreddit.top(limit=numberOfPosts, time_filter=time)
     elif postType == "controversial":
@@ -105,7 +112,7 @@ for s in subreddits:
     elif postType == "new":
         posts = subreddit.new(limit=numberOfPosts)
     else:
-        posts = subreddit.rising(limit=numberOfPosts, time_filter=time)
+        posts = subreddit.rising(limit=numberOfPosts)
     
     # Go through each post and process the title. Do description and comments if necessary.
     for post in posts:
