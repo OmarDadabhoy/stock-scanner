@@ -29,7 +29,7 @@ def addStocks(sentence, mapOfStocks, allstocks):
     # Loop through each word
     for word in splits:
         # If the word is a ticker then add it to the mapOfStocks
-        if containsList(word, allstocks):
+        if allstocks.get(word) != None:
             if mapOfStocks.get(word) == None:
                 mapOfStocks.update({word: 1})
             else: 
@@ -48,12 +48,12 @@ def processComments(reddit, post, mapOfStocks, allStocks):
             continue
         addStocks(comment.body, mapOfStocks, allStocks)
 
-# Checks if word is in list
-def containsList(word, list):
-    for i in list:
-        if word == i:
-            return True
-    return False
+# converts the stockslist into a map
+def listToMap(stockslist):
+    allStocks = {}
+    for i in stockslist:
+        allStocks.update({i: 1})
+    return allStocks
 
 # Ask user for information about their username and stuff
 print("Enter your reddit username: ")
@@ -96,7 +96,8 @@ if useCommentsAns == 'Y' or useCommentsAns == 'y':
 
 # Create the map and get all the stocks from the csv
 mapOfStocks = {}
-allStocks = gt.get_tickers()
+stockslist = gt.get_tickers()
+allStocks = listToMap(stockslist)
 
 # Go through the subreddits and get the data
 for s in subreddits:
