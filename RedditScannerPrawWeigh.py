@@ -35,12 +35,16 @@ def addStocks(sentence, mapOfStocks, allstocks, rank):
     splits = sentence.split()
     # Loop through each word
     for word in splits:
+        newWord = word
+        # if the first letter of the word is a $ get rid of it 
+        if word[0:1] == "$":
+            newWord = word[1:]
         # If the word is a ticker then add it to the mapOfStocks
-        if allstocks.get(word) != None:
-            if mapOfStocks.get(word) == None:
-                mapOfStocks.update({word: newRank})
+        if allstocks.get(newWord) != None:
+            if mapOfStocks.get(newWord) == None:
+                mapOfStocks.update({newWord: newRank})
             else: 
-                mapOfStocks.update({word: mapOfStocks.get(word) + newRank})
+                mapOfStocks.update({newWord: mapOfStocks.get(newWord) + newRank})
 
 # This function processes comments for the post that is passed in
 # reddit- the reddit object which allows us to communicate with reddit
