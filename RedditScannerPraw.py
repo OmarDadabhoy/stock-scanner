@@ -108,7 +108,8 @@ useComments = False
 if useCommentsAns == 'Y' or useCommentsAns == 'y':
     useComments = True
 
-# Gets all tickers from nasdaq ftp directory
+# Creates a map and gets all tickers from nasdaq ftp directory
+mapOfStocks = {}
 allStocks = tickers.getNasdaqTickers()
 
 # Go through the subreddits and get the data
