@@ -1,5 +1,4 @@
 import praw
-import getpass
 import os
 import csv
 import math

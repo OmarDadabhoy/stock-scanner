@@ -1,7 +1,7 @@
 import praw
-import getpass
 import os
 import csv
+import keys
 from get_all_tickers import get_tickers as gt
 from praw.models import MoreComments
 
@@ -59,13 +59,13 @@ def listToMap(stockslist):
         allStocks.update({i: 1})
     return allStocks
 
-# Ask user for information about their username and stuff
-print("Enter your reddit username: ")
-username = str(input())
-print("Enter your reddit password: ")
-password = getpass.getpass()
-APPID = ''
-APPSECRET = ''
+# Set reddits user creds
+username = keys.REDDITUSER
+password = keys.REDDITPASS
+
+# Set reddit API keys
+APPID = keys.APPID
+APPSECRET = keys.APPSECRET
 
 # The reddit object which allows us to communicate with Reddit
 reddit = praw.Reddit(client_id=APPID, client_secret=APPSECRET, password=password, user_agent='stock-scanner-script by ' + username, username=username)

@@ -2,7 +2,7 @@ import requests
 import requests.auth
 import os
 import csv
-import getpass
+import keys
 
 # This puts the CSV tickers and names into a map
 def convertCSVToMap():
@@ -50,13 +50,13 @@ def addStocks(sentence, mapOfStocks, allstocks):
 
 
 #constants
-# Ask user for information about their username and stuff
-print("Enter your reddit username: ")
-username = str(input())
-print("Enter your reddit password: ")
-password = getpass.getpass()
-APPID = ''
-APPSECRET = ''
+# Set reddits user creds
+username = keys.REDDITUSER
+password = keys.REDDITPASS
+
+# Set reddit API keys
+APPID = keys.APPID
+APPSECRET = keys.APPSECRET
 # print("Enter your APPID: ")
 # APPID = str(input())
 # print("Enter your app secret: ")
