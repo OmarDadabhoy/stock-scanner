@@ -2,10 +2,12 @@ import praw
 import os
 import csv
 import keys
-from get_all_tickers import get_tickers as gt
+import tickers
 from praw.models import MoreComments
 
 # This puts the CSV tickers and names into a map
+
+
 def convertCSVToMap():
     # Get the path for the file with the tickers
     pathName = os.getcwd()
@@ -23,20 +25,22 @@ def convertCSVToMap():
 # sentence- The sentence that needs to parsed which possibly contains any stock tickers
 # mapOfStocks - The mapping between stock tickers and the number of times they appear
 # allstocks- A map of all stock tickers
+
+
 def addStocks(sentence, mapOfStocks, allstocks):
     # Split the sentence into words
     splits = sentence.split()
     # Loop through each word
     for word in splits:
         newWord = word
-        # if the first letter of the word is a $ get rid of it 
+        # if the first letter of the word is a $ get rid of it
         if word[0:1] == "$":
             newWord = word[1:]
         # If the word is a ticker then add it to the mapOfStocks
         if allstocks.get(newWord) != None:
             if mapOfStocks.get(newWord) == None:
                 mapOfStocks.update({newWord: 1})
-            else: 
+            else:
                 mapOfStocks.update({newWord: mapOfStocks.get(newWord) + 1})
 
 # This function processes comments for the post that is passed in
@@ -44,6 +48,8 @@ def addStocks(sentence, mapOfStocks, allstocks):
 # post - The thread whose comments we want to get
 # mapOfStocks - The mapping between stock tickers and the number of times they appear
 # allstocks- A map of all stock tickers
+
+
 def processComments(reddit, post, mapOfStocks, allStocks):
     # Go through each comment and make a call to the addStocks function
     submission = reddit.submission(str(post.id))
@@ -53,11 +59,14 @@ def processComments(reddit, post, mapOfStocks, allStocks):
         addStocks(comment.body, mapOfStocks, allStocks)
 
 # converts the stockslist into a map
+
+
 def listToMap(stockslist):
     allStocks = {}
     for i in stockslist:
         allStocks.update({i: 1})
     return allStocks
+
 
 # Set reddits user creds
 username = keys.REDDITUSER
@@ -68,7 +77,8 @@ APPID = keys.APPID
 APPSECRET = keys.APPSECRET
 
 # The reddit object which allows us to communicate with Reddit
-reddit = praw.Reddit(client_id=APPID, client_secret=APPSECRET, password=password, user_agent='stock-scanner-script by ' + username, username=username)
+reddit = praw.Reddit(client_id=APPID, client_secret=APPSECRET, password=password,
+                     user_agent='stock-scanner-script by ' + username, username=username)
 
 # Ask the user what subreddits they want to go through
 subreddits = []
@@ -98,16 +108,14 @@ useComments = False
 if useCommentsAns == 'Y' or useCommentsAns == 'y':
     useComments = True
 
-# Create the map and get all the stocks from the csv
-mapOfStocks = {}
-stockslist = gt.get_tickers()
-allStocks = listToMap(stockslist)
+# Gets all tickers from nasdaq ftp directory
+allStocks = tickers.getNasdaqTickers()
 
 # Go through the subreddits and get the data
 for s in subreddits:
     posts = None
     subreddit = reddit.subreddit(s)
-    # get the posts based on the postTypes the user wants and the number they want. 
+    # get the posts based on the postTypes the user wants and the number they want.
     if postType == "hot":
         posts = subreddit.hot(limit=numberOfPosts)
     elif postType == "top":
@@ -118,7 +126,7 @@ for s in subreddits:
         posts = subreddit.new(limit=numberOfPosts)
     else:
         posts = subreddit.rising(limit=numberOfPosts)
-    
+
     # Go through each post and process the title. Do description and comments if necessary.
     for post in posts:
         addStocks(post.title, mapOfStocks, allStocks)
@@ -133,7 +141,7 @@ for s in subreddits:
 sortedVals = sorted(mapOfStocks.values())
 seen = {}
 
-#initialize the seen array
+# initialize the seen array
 for key in mapOfStocks.keys():
     seen.update({key: False})
 
