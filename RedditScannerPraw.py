@@ -5,9 +5,8 @@ import keys
 import tickers
 from praw.models import MoreComments
 
+
 # This puts the CSV tickers and names into a map
-
-
 def convertCSVToMap():
     # Get the path for the file with the tickers
     pathName = os.getcwd()
@@ -21,12 +20,11 @@ def convertCSVToMap():
             map.update({column: 1})
     return map
 
+
 # This function needs to add any stock tickers seen in sentnce into into the mapOfStocks
 # sentence- The sentence that needs to parsed which possibly contains any stock tickers
 # mapOfStocks - The mapping between stock tickers and the number of times they appear
 # allstocks- A map of all stock tickers
-
-
 def addStocks(sentence, mapOfStocks, allstocks):
     # Split the sentence into words
     splits = sentence.split()
@@ -43,13 +41,12 @@ def addStocks(sentence, mapOfStocks, allstocks):
             else:
                 mapOfStocks.update({newWord: mapOfStocks.get(newWord) + 1})
 
+
 # This function processes comments for the post that is passed in
 # reddit- the reddit object which allows us to communicate with reddit
 # post - The thread whose comments we want to get
 # mapOfStocks - The mapping between stock tickers and the number of times they appear
 # allstocks- A map of all stock tickers
-
-
 def processComments(reddit, post, mapOfStocks, allStocks):
     # Go through each comment and make a call to the addStocks function
     submission = reddit.submission(str(post.id))
@@ -57,15 +54,6 @@ def processComments(reddit, post, mapOfStocks, allStocks):
         if isinstance(comment, MoreComments):
             continue
         addStocks(comment.body, mapOfStocks, allStocks)
-
-# converts the stockslist into a map
-
-
-def listToMap(stockslist):
-    allStocks = {}
-    for i in stockslist:
-        allStocks.update({i: 1})
-    return allStocks
 
 
 # Set reddits user creds
@@ -97,12 +85,12 @@ print("Enter the number of posts you want to grab from each subreddit (max = 100
 numberOfPosts = int(input())
 
 # Does the user want to take the description and comments into account
-print("Do you want to use the descriptions as well? (Enter y for yes and n for no): ")
+print("Do you want to use the descriptions as well? (y/n): ")
 useDescriptionAnswer = str(input())
 useDescription = False
 if useDescriptionAnswer == "y" or useDescriptionAnswer == "Y":
     useDescription = True
-print("Do you want to use comments as well? (Enter y for yes and n for no): ")
+print("Do you want to use comments as well? (y/n): ")
 useCommentsAns = str(input())
 useComments = False
 if useCommentsAns == 'Y' or useCommentsAns == 'y':

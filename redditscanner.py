@@ -4,9 +4,8 @@ import os
 import csv
 import keys
 
+
 # This puts the CSV tickers and names into a map
-
-
 def convertCSVToMap():
     pathName = os.getcwd()
     pathName = pathName + "/nasdaq_screener.csv"

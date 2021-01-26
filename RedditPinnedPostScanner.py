@@ -6,9 +6,8 @@ import keys
 import tickers
 from praw.models import MoreComments
 
+
 # This puts the CSV tickers and names into a map
-
-
 def convertCSVToMap():
     # Get the path for the file with the tickers
     pathName = os.getcwd()
@@ -22,12 +21,11 @@ def convertCSVToMap():
             map.update({column: 1})
     return map
 
+
 # This function needs to add any stock tickers seen in sentnce into into the mapOfStocks
 # sentence- The sentence that needs to parsed which possibly contains any stock tickers
 # mapOfStocks - The mapping between stock tickers and the number of times they appear
 # allstocks- A map of all stock tickers
-
-
 def addStocks(sentence, mapOfStocks, allstocks, rank):
     # This newRank serves to weight stocks appearing at the top higher
     newRank = rank
