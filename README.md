@@ -10,6 +10,10 @@ Use python's virtual environment feature to download and isolate all the package
 
 This will create the virtual environment, activate it, and then install all needed packages
 
+Run this command to keep the keys file from getting updated
+
+'''git update-index --assume-unchanged keys'''
+
 ## Usage
 
 When running either script, they will ask a series of questions which then makes calls to reddit with your information and grabs the information necessary. The difference is that the RedditScannerPraw can process comments as well making it a bit more useful in most cases.
