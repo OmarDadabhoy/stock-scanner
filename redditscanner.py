@@ -2,7 +2,8 @@ import requests
 import requests.auth
 import os
 import csv
-import getpass
+import keys
+
 
 # This puts the CSV tickers and names into a map
 def convertCSVToMap():
@@ -17,7 +18,6 @@ def convertCSVToMap():
     return map
 
 
-
 # This function needs to add any stock tickers passed in into the mapOfStocks
 def addStocks(sentence, mapOfStocks, allstocks):
     splits = sentence.split()
@@ -25,7 +25,7 @@ def addStocks(sentence, mapOfStocks, allstocks):
         if allstocks.get(word) != None:
             if mapOfStocks.get(word) == None:
                 mapOfStocks.update({word: 1})
-            else: 
+            else:
                 mapOfStocks.update({word: mapOfStocks.get(word) + 1})
 
 # # This function gets the comments for the passed in thread in the subreddit
@@ -49,14 +49,14 @@ def addStocks(sentence, mapOfStocks, allstocks):
 #     return True
 
 
-#constants
-# Ask user for information about their username and stuff
-print("Enter your reddit username: ")
-username = str(input())
-print("Enter your reddit password: ")
-password = getpass.getpass()
-APPID = ''
-APPSECRET = ''
+# constants
+# Set reddits user creds
+username = keys.REDDITUSER
+password = keys.REDDITPASS
+
+# Set reddit API keys
+APPID = keys.APPID
+APPSECRET = keys.APPSECRET
 # print("Enter your APPID: ")
 # APPID = str(input())
 # print("Enter your app secret: ")
@@ -66,13 +66,15 @@ APPSECRET = ''
 base_url = 'https://www.reddit.com/'
 data = {"grant_type": "password", "username": username, "password": password}
 auth = requests.auth.HTTPBasicAuth(APPID, APPSECRET)
-r = requests.post(base_url + 'api/v1/access_token', data=data, headers={'user-agent': 'stock-scanner-script by ' + username}, auth=auth)
+r = requests.post(base_url + 'api/v1/access_token', data=data,
+                  headers={'user-agent': 'stock-scanner-script by ' + username}, auth=auth)
 d = r.json()
 
 # Make an api request to get user information
 token = 'bearer ' + d['access_token']
 base_url = 'https://oauth.reddit.com'
-headers = {'Authorization': token, 'User-Agent': 'stock-scanner-script by ' + username}
+headers = {'Authorization': token,
+           'User-Agent': 'stock-scanner-script by ' + username}
 
 # Ask the user what subreddits they want to go through
 subreddits = []
@@ -98,23 +100,26 @@ if useDescriptionAnswer == "y" or useDescriptionAnswer == "Y":
     useDescription = True
 # useComments = True
 
-#go thorugh the subreddit and grab info we need
+# go thorugh the subreddit and grab info we need
 payload = {'t': time, 'limit': numberOfPosts}
 mapOfStocks = {}
 allStocks = convertCSVToMap()
-for s in subreddits: 
+for s in subreddits:
     stringFormat = "/r/" + s + "/" + postType
-    postResponse = requests.get(base_url + stringFormat, headers=headers, params=payload)
+    postResponse = requests.get(
+        base_url + stringFormat, headers=headers, params=payload)
     js = postResponse.json()
     # print(js)
     # This goes through each piece in the json and only does title for now
     for i in range(js['data']['dist']):
-        #title
-        addStocks(js['data']['children'][i]['data']['title'], mapOfStocks, allStocks)
-        #text in the post
+        # title
+        addStocks(js['data']['children'][i]['data']
+                  ['title'], mapOfStocks, allStocks)
+        # text in the post
         if useDescription:
-            addStocks(js['data']['children'][i]['data']['selftext'], mapOfStocks, allStocks)
-        #comments 
+            addStocks(js['data']['children'][i]['data']
+                      ['selftext'], mapOfStocks, allStocks)
+        # comments
         # if useComments:
         #     commentsJson = getComments(js, i, s, base_url, headers)
         #     processComments(commentsJson, mapOfStocks, allStocks)
@@ -124,7 +129,7 @@ for s in subreddits:
 sortedVals = sorted(mapOfStocks.values())
 seen = {}
 
-#initialize the seen array
+# initialize the seen array
 for key in mapOfStocks.keys():
     seen.update({key: False})
 
